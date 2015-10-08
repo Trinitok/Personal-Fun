@@ -1,3 +1,5 @@
+//  http://www.pinmobilesex.com/pics/t/990.jpg
+
 import java.awt.*;
 
 import javax.imageio.ImageIO;
@@ -23,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -36,6 +39,8 @@ public class MagicFrame extends JFrame {
 	int TY = 30;
 	private Console cs = new Console();
 	JTabbedPane tabs = new JTabbedPane();
+	int tabNum = 0;
+	HashMap<String, String[]> archived = new HashMap<String, String[]>();
 
 	// constructor for the frame
 	public MagicFrame() throws IOException {
@@ -44,12 +49,62 @@ public class MagicFrame extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Container content = getContentPane();
 		content.setLayout(new BorderLayout());
-		content.add(new ControlPanel(), BorderLayout.WEST);
+		
+		(new File("Magic the Gathering Archived Files")).mkdir();
+		
+		//  Add the conent for the control panel and button panel
+		ControlPanel cpanel = new ControlPanel();
+
+		content.add(cpanel, BorderLayout.WEST);
+//		content.add(new ButtonPanel(), BorderLayout.WEST);
+		
+		MagicFrame.this.sp.addChangeListener(new ChangeListener() {
+			int lastTabIndex = 0;
+			
+			@Override
+			public void stateChanged(ChangeEvent e){
+				int newIndex = MagicFrame.this.sp.getSelectedIndex();
+				System.out.println("changing state");
+				System.out.println("last index = " + lastTabIndex);
+				System.out.println("new tab " + newIndex);
+				
+				if(lastTabIndex == 0 && newIndex == 1){
+					// switch from archive to search
+					cpanel.In.setVisible(true);
+					cpanel.add.setVisible(true);
+					cpanel.getComponent(0).setVisible(true);
+					// hide all the buttons for archived cards
+					if(cpanel.getComponentCount() > 3){
+						for(int i = 3; i < cpanel.getComponentCount(); i ++){
+							cpanel.getComponent(i).setVisible(false);
+						}
+					}
+				}
+				if(lastTabIndex == 0 && newIndex == 0){
+					// switch from search to archive
+					cpanel.In.setVisible(false);
+					cpanel.add.setVisible(false);
+					cpanel.getComponent(0).setVisible(false);
+					// show all the buttons for archived cards
+					if(cpanel.getComponentCount() > 3){
+						for(int i = 3; i < cpanel.getComponentCount(); i ++){
+							cpanel.getComponent(i).setVisible(true);
+						}
+					}
+				}
+				
+			}
+			
+			
+		});
+		
 		TitledBorder border = BorderFactory.createTitledBorder(
 				BorderFactory.createLoweredBevelBorder(), "Display Panel");
 		border.setTitleJustification(TitledBorder.LEFT);
+		
 		this.sp.setBorder(border);
 		this.sp.setPreferredSize(new Dimension(1000,1000));
+//		this.sp.addTab("test", this.sp);
 		
 //		this.sp.addTab("test", temporaryLostComponent);
 		JScrollPane scrollPane = new JScrollPane(sp);
@@ -66,6 +121,8 @@ public class MagicFrame extends JFrame {
         	
         }
         
+        
+        
         //  set the icon for the image
         BufferedImage image = ImageIO.read(new File("magicFrameIcon.jpg"));
         ImageIcon icon = new ImageIcon(image);
@@ -75,12 +132,28 @@ public class MagicFrame extends JFrame {
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
 		
+		// add the archived tab
+		JLabel lbl=new JLabel();
+        MagicFrame.this.sp.add(lbl);
+        
+		
+        //add search tab
+        JLabel lbl2=new JLabel();
+        MagicFrame.this.sp.add(lbl2);
+        sp.setTitleAt(0, "Archived");
+        sp.setTitleAt(1, "Search");
+        sp.setSelectedIndex(1);
+        
+        
+		
 		//  add the various panels and console
 		content.add(scrollPane, BorderLayout.CENTER);
 		content.add(this.cs, BorderLayout.SOUTH);
 		
 		setVisible(true);
 	}
+	
+	
 
 	// save the icon img
 	private void saveImage(String imageUrl, String destinationFile) throws IOException {
@@ -126,12 +199,14 @@ public class MagicFrame extends JFrame {
 	}
 	
 	//  where I will put the jinputfield and the button for adding
+	//  where I will put the buttons for archived files
 	class ControlPanel extends JPanel {
 		InputField In = new InputField();
 		AddButton add = new AddButton();
 
 		@SuppressWarnings("deprecation")
 		public ControlPanel() {
+			
 			TitledBorder border = BorderFactory.createTitledBorder(
 					BorderFactory.createLoweredBevelBorder(), "Control Panel");
 			border.setTitleJustification(TitledBorder.LEFT);
@@ -162,10 +237,59 @@ public class MagicFrame extends JFrame {
 			this.add(new JLabel("Put in the full card name:"));
 			this.add(this.In);
 			this.add(this.add);
-
+			this.loadArchivedFiles();
 		}
 		
 		
+
+		private void loadArchivedFiles() {
+			File URL = new File("Magic the Gathering Archived Files");
+			// check to see if files are there before moving forward
+			if(!URL.exists()){
+				return;
+			}
+			else{
+				File[] archivedFiles = URL.listFiles();
+				for(int i = 0; i < archivedFiles.length; i ++){
+					if(archivedFiles[i].getName().contains(".jpg")){
+						File curr = archivedFiles[i];
+						JButton archivedFile = new JButton(archivedFiles[i].getName());
+						archivedFile.addMouseListener(new MouseAdapter() {
+							
+							@Override
+							public void mousePressed(MouseEvent e) {
+								
+					            BufferedImage image;
+								try {
+									
+									image = ImageIO.read(curr);
+									ImageIcon icon = new ImageIcon(image);
+									MagicFrame.this.sp.remove(0);
+						        	JLabel lbl=new JLabel();
+							        lbl.setIcon(icon);
+							        MagicFrame.this.sp.add(lbl, 0);
+							        MagicFrame.this.sp.setTitleAt(0, "Archive");
+							        MagicFrame.this.sp.setTitleAt(1, "Search");
+						          
+							        MagicFrame.this.sp.setSelectedIndex(0);
+								} catch (IOException e1) {
+									e1.printStackTrace();
+								}
+					            
+					            
+					            
+					            
+					            
+							}
+						});
+						ControlPanel.this.add(archivedFile);
+					}
+				}
+			}
+				
+		}
+
+
 
 		class SliderListener1 implements ChangeListener {
 			@Override
@@ -193,19 +317,22 @@ public class MagicFrame extends JFrame {
 			public AddButton() {
 				super("Add");
 				this.addMouseListener(new MouseAdapter() {
+					
 					@Override
 					public void mousePressed(MouseEvent e) {
 						
 						
 						
 						
-						//  Search the library of cards
+						//  Search the library of cards on gatherer
 						try {
 							
 							// get the string and handle spaces for the google image search
 							String a = ControlPanel.this.In
 									.getText();
 							a = a.replaceAll(" ", "+");
+							// check to see if file exists
+				            if(!(new File("Magic the Gathering Archived Files\\"+a + ".jpg").exists())){
 							
 							
 							URL url = new URL("https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q="+a+"+magiccards.info");
@@ -222,27 +349,77 @@ public class MagicFrame extends JFrame {
 
 				            JSONObject json = new JSONObject(builder.toString());
 				            String imageUrl = json.getJSONObject("responseData").getJSONArray("results").getJSONObject(0).getString("url");
-				            String imageDest = "test3.jpg";
+				            String imageDest = "Magic the Gathering Archived Files\\"+a + ".jpg";
 				            System.out.println("Success 3");
 				            
-				            saveImage(imageUrl, imageDest);
-				            System.out.println("Success 4");
 				            
+					            saveImage(imageUrl, imageDest);
+					            
+					            
+					         // add the new cards to the archive
+					            JButton archivedCard = new JButton(a);
+					            archivedCard.addMouseListener(new MouseAdapter() {
+									
+									@Override
+									public void mousePressed(MouseEvent e) {
+										File readThis = new File("Magic the Gathering Archived Files\\" + archivedCard.getText() + ".jpg");
+							            BufferedImage image;
+										try {
+											image = ImageIO.read(readThis);
+											ImageIcon icon = new ImageIcon(image);
+											sp.remove(0);
+								        	JLabel lbl=new JLabel();
+									        lbl.setIcon(icon);
+									        MagicFrame.this.sp.add(lbl, 0);
+									        sp.setTitleAt(0, "Archive");
+									        sp.setTitleAt(1, "Search");
+								          
+									        sp.setSelectedIndex(0);
+										} catch (IOException e1) {
+											// TODO Auto-generated catch block
+											e1.printStackTrace();
+										}
+							            
+							            
+							            
+							            
+							            
+									}
+								});
+					            
+					            ControlPanel.this.add(archivedCard);
+					            
+					            ControlPanel.this.repaint();
+				            }
+				            else{
+				            				            	
+				            }
 				            
-				            BufferedImage image = ImageIO.read(new File("test3.jpg"));
+				            File readThis = new File("Magic the Gathering Archived Files\\"+a + ".jpg");
+				            
+				            BufferedImage image = ImageIO.read(readThis);
+				            
 				            ImageIcon icon = new ImageIcon(image);
 				          
-				          JLabel lbl=new JLabel();
-				          lbl.setIcon(icon);
-				          MagicFrame.this.sp.add(lbl);
+				            
+				            sp.remove(1);
+				        	JLabel lbl=new JLabel();
+					        lbl.setIcon(icon);
+					        MagicFrame.this.sp.add(lbl, 1);
+					        sp.setTitleAt(0, "Archive");
+					        sp.setTitleAt(1, "Search");
+				          
+					        sp.setSelectedIndex(1);
+				          
 				          
 				          
 				          // Delete the file when closing
-				          File file = new File(imageDest);
-				          file.deleteOnExit();
-							
+//				          File file = new File(imageDest);
+//				          file.deleteOnExit();
+//							
 							
 							MagicFrame.this.sp.repaint();
+							
 							
 							MagicFrame.this.cs
 							.setText("Card Name:" 
@@ -268,6 +445,8 @@ public class MagicFrame extends JFrame {
 					        		inputLine = inputLine.replaceAll(" ", "");
 					        		inputLine = inputLine.replaceAll("</div>", "");
 					        		cardName = inputLine;
+					        		
+					        		
 					        	}
 					        	
 					        	if(inputLine.contains("Types:")){
@@ -288,15 +467,19 @@ public class MagicFrame extends JFrame {
 					        		
 					        	}
 					        	
-					        	if(inputLine.contains("Card Text")){
-					        		String inputLine2;
-					        		while((inputLine2 = in.readLine()) != null && !inputLine2.contains("Flavor Text")){
-					        			cardText.concat(inputLine2);
-					        		}
+					        	if(inputLine.contains("cardtextbox")){
+					        		inputLine = inputLine.replaceAll("</div>", "");
+					        		inputLine = inputLine.replaceAll("  ", "");
+					        		inputLine = inputLine.replaceAll("<div class=\"cardtextbox\" style=\"padding-left:10px;\">", "");
+					        			cardText = cardText.concat(inputLine);
+					        		
 					        	}
 					        }
+					        
+							
 					            
 					        in.close();
+					        
 					        
 					        MagicFrame.this.cs
 							.setText("Card Name:   "+cardName
@@ -312,20 +495,25 @@ public class MagicFrame extends JFrame {
 											+ nFE.getMessage());
 							
 						}
+						
 					}
 
 					public void saveImage(String imageUrl, String destinationFile) throws IOException {
-						imageUrl.replaceAll(" ", "+");
+						
+						
 						System.out.println(imageUrl);
 						System.out.println(destinationFile);
 					    URL url = new URL(imageUrl);
+					    // open the IO stream for the image
 					    InputStream is = url.openStream();
+					    //  Go to the destination file
 					    OutputStream os = new FileOutputStream(destinationFile);
 					    System.out.println("success3.1");
 
 					    byte[] b = new byte[2048];
 					    int length;
-
+					    
+					    //  Write to the file with the number of bytes
 					    while ((length = is.read(b)) != -1) {
 					        os.write(b, 0, length);
 					    }
@@ -351,6 +539,8 @@ public class MagicFrame extends JFrame {
 				this.setColumns(10);
 				this.selectAll();
 				
+				
+				
 				this.addActionListener(new ActionListener() {
 
 				    @Override
@@ -362,42 +552,90 @@ public class MagicFrame extends JFrame {
 							// get the string and handle spaces for the google image search
 							String a = ControlPanel.this.In
 									.getText();
+							
 							a = a.replaceAll(" ", "+");
+							if(!(new File("Magic the Gathering Archived Files\\"+a + ".jpg").exists())){
 							
-							
-							URL url = new URL("https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q="+a+"+magiccards.info");
-				            URLConnection connection = url.openConnection();
-				            System.out.println("Success 1");
-
-				            String line;
-				            StringBuilder builder = new StringBuilder();
-				            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-				            while((line = reader.readLine()) != null) {
-				                builder.append(line);
-				            }
-				            System.out.println("Success 2");
-
-				            JSONObject json = new JSONObject(builder.toString());
-				            String imageUrl = json.getJSONObject("responseData").getJSONArray("results").getJSONObject(0).getString("url");
-				            String imageDest = "test3.jpg";
-				            System.out.println("Success 3");
-				            
-				            saveImage(imageUrl, imageDest);
-				            System.out.println("Success 4");
-				            
-				            
-				            BufferedImage image = ImageIO.read(new File("test3.jpg"));
+								URL url = new URL("https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q="+a+"+magiccards.info");
+					            URLConnection connection = url.openConnection();
+					            System.out.println("Success 1");
+					            
+	
+					            String line;
+					            StringBuilder builder = new StringBuilder();
+					            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+					            while((line = reader.readLine()) != null) {
+					                builder.append(line);
+					            }
+					            System.out.println("Success 2");
+	
+					            JSONObject json = new JSONObject(builder.toString());
+					            String imageUrl = json.getJSONObject("responseData").getJSONArray("results").getJSONObject(0).getString("url");
+					            String imageDest = "Magic the Gathering Archived Files\\"+a + ".jpg";
+					            System.out.println("Success 3");
+					            
+					            saveImage(imageUrl, imageDest);
+					            System.out.println("Success 4");
+					            
+					            // add the new cards to the archive
+					            JButton archivedCard = new JButton(a);
+					            archivedCard.addMouseListener(new MouseAdapter() {
+									
+									@Override
+									public void mousePressed(MouseEvent e) {
+										File readThis = new File("Magic the Gathering Archived Files\\" + archivedCard.getText() + ".jpg");
+							            BufferedImage image;
+										try {
+											image = ImageIO.read(readThis);
+											ImageIcon icon = new ImageIcon(image);
+											sp.remove(0);
+								        	JLabel lbl=new JLabel();
+									        lbl.setIcon(icon);
+									        MagicFrame.this.sp.add(lbl, 0);
+									        sp.setTitleAt(0, "Archive");
+									        sp.setTitleAt(1, "Search");
+								          
+									        sp.setSelectedIndex(0);
+										} catch (IOException e1) {
+											// TODO Auto-generated catch block
+											e1.printStackTrace();
+										}
+							            
+							            
+							            
+							            
+							            
+									}
+								});
+					            
+					            ControlPanel.this.add(archivedCard);
+					            
+					            ControlPanel.this.repaint();
+					            
+							}
+							else{
+								
+							}
+							File readThis = new File("Magic the Gathering Archived Files\\"+a + ".jpg");
+				            BufferedImage image = ImageIO.read(readThis);
 				            ImageIcon icon = new ImageIcon(image);
+				            
+				            System.out.println(sp.getTabCount());
+				            
+				            sp.remove(1);
+				        	JLabel lbl=new JLabel();
+					        lbl.setIcon(icon);
+					        MagicFrame.this.sp.add(lbl, 1);
+					        sp.setTitleAt(0, "Archive");
+					        sp.setTitleAt(1, "Search");
 				          
-				          JLabel lbl=new JLabel();
-				          lbl.setIcon(icon);
-				          MagicFrame.this.sp.add(lbl);
+					        sp.setSelectedIndex(1);
+
 				          
 				          
 				          // Delete the file when closing
-				          File file = new File(imageDest);
-				          file.deleteOnExit();
-							
+//				          File file = new File(imageDest);
+//				          file.deleteOnExit();
 							
 							MagicFrame.this.sp.repaint();
 							
@@ -439,17 +677,17 @@ public class MagicFrame extends JFrame {
 					        		inputLine = in.readLine();
 					        		inputLine = in.readLine();
 					        		inputLine = in.readLine();
-					        		inputLine = inputLine.replaceAll(" ", "");
+					        		inputLine = inputLine.replaceAll("  ", "");
 					        		inputLine = inputLine.replaceAll("</div>", "");
 					        		cost = inputLine;
 					        		
 					        	}
 					        	
-					        	if(inputLine.contains("Card Text")){
-					        		String inputLine2;
-					        		while((inputLine2 = in.readLine()) != null && !inputLine2.contains("Flavor Text")){
-					        			cardText.concat(inputLine2);
-					        		}
+					        	if(inputLine.contains("<div class=\"cardtextbox\" style=\"padding-left:10px;\">")){
+					        		inputLine = inputLine.replaceAll("</div>", "");
+					        		inputLine = inputLine.replaceAll("  ", "");
+					        		inputLine = inputLine.replaceAll("<div class=\"cardtextbox\" style=\"padding-left:10px;\">", "");
+					        			cardText = cardText.concat(inputLine);
 					        	}
 					        }
 					            
@@ -477,14 +715,19 @@ public class MagicFrame extends JFrame {
 
 	// Panel where the card picture is going to be displayed
 	@SuppressWarnings("rawtypes")
-	class Panel extends JPanel {
+	class Panel extends JTabbedPane {
+		
+		
 		
 		public Panel(){
+//			this.setTitleAt(0, "test");
 			JTabbedPane tabs = new JTabbedPane();
 			JComponent panel1 = makeTextPanel("Panel #1");
 	        tabs.addTab("Tab 1", null,panel1,
 	                "Does nothing");
 			tabs.setMnemonicAt(0, KeyEvent.VK_1);
+			
+			
 			
 //			add(tabs);
 			
@@ -503,6 +746,8 @@ public class MagicFrame extends JFrame {
 	        panel.add(filler);
 	        return panel;
 	    }
+		
+		
 
 		
 	}
@@ -522,50 +767,5 @@ public class MagicFrame extends JFrame {
 
 		}
 	}
-	
-//	class TabbedPane extends JPanel{
-//		public TabbedPane() {
-//	        super(new GridLayout(1, 1));
-//	         
-//	        JTabbedPane tabbedPane = new JTabbedPane();
-//	         
-//	        JComponent panel1 = makeTextPanel("Panel #1");
-//	        tabbedPane.addTab("Tab 1", null,panel1,
-//	                "Does nothing");
-//	        tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
-//	         
-//	        JComponent panel2 = makeTextPanel("Panel #2");
-//	        tabbedPane.addTab("Tab 2", null, panel2,
-//	                "Does twice as much nothing");
-//	        tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
-//	         
-//	        JComponent panel3 = makeTextPanel("Panel #3");
-//	        tabbedPane.addTab("Tab 3", null, panel3,
-//	                "Still does nothing");
-//	        tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
-//	         
-//	        JComponent panel4 = makeTextPanel(
-//	                "Panel #4 (has a preferred size of 410 x 50).");
-//	        panel4.setPreferredSize(new Dimension(410, 50));
-//	        tabbedPane.addTab("Tab 4", null, panel4,
-//	                "Does nothing at all");
-//	        tabbedPane.setMnemonicAt(3, KeyEvent.VK_4);
-//	         
-//	        //Add the tabbed pane to this panel.
-//	        add(tabbedPane);
-//	         
-//	        //The following line enables to use scrolling tabs.
-//	        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-//	    }
-//	     
-//	    protected JComponent makeTextPanel(String text) {
-//	        JPanel panel = new JPanel(false);
-//	        JLabel filler = new JLabel(text);
-//	        filler.setHorizontalAlignment(JLabel.CENTER);
-//	        panel.setLayout(new GridLayout(1, 1));
-//	        panel.add(filler);
-//	        return panel;
-//	    }
-//	}
 
 }
