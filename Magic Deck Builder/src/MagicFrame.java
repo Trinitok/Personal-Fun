@@ -104,7 +104,7 @@ public class MagicFrame extends JFrame {
 		JScrollPane scrollPane = new JScrollPane(sp);
 
 		// troll icon img if someone hax this
-		String imageUrl = "http://www.pinmobilesex.com/pics/t/990.jpg";
+		String imageUrl = "http://orig03.deviantart.net/55b8/f/2013/225/6/5/mountain__return_to_ravnica__by_adampaquette-d6i1kx9.jpg";
 		String imageDest = "magicFrameIcon.jpg";
 
 		// check to see if the icon has already been downloaded so you do not
