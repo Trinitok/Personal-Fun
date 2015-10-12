@@ -71,8 +71,11 @@ public class Mail {
 	public static void main(String[] args) {
 		Mail test = new Mail();
 		try {
-			test.Send("username", "password", "maxwellrkelly@gmail.com",
-					"test", "This is a test");
+//			test.Send("username", "password", "maxwellrkelly@gmail.com",
+//					"test", "This is a test");
+
+			test.Send("username", "password", "maxwellrkelly@gmail.com", "" /** no CC recipients **/, "test", "This is a test");
+
 		} catch (MessagingException e) {
 			e.printStackTrace();
 		}
