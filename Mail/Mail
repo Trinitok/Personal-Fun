@@ -10,16 +10,20 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 public class Mail {
+
+	// empty constructor.  No reason to put stuff in here?
 	private Mail() {
 
 	}
-
+	
+	//  A send that "models" what the method should look like
 	public static void Send(final String username, final String password,
 			String recipientEmail, String title, String message)
 			throws AddressException, MessagingException {
 		Mail.Send(username, password, recipientEmail, "test", title, message);
 	}
 
+	//  A send that will actually do magic
 	public static void Send(final String username, final String password,
 			String recipientEmail, String ccEmail, String title, String message)
 			throws AddressException, MessagingException {
@@ -28,30 +32,31 @@ public class Mail {
 
 		// Get a Properties object
 		Properties props = System.getProperties();
+		
+		// get the gmail server properties
 		props.setProperty("mail.smtps.host", "smtp.gmail.com");
 		props.setProperty("mail.smtp.socketFactory.class", SSL_FACTORY);
 		props.setProperty("mail.smtp.socketFactory.fallback", "false");
+		
+		//  set the socket and port being used
 		props.setProperty("mail.smtp.port", "465");
 		props.setProperty("mail.smtp.socketFactory.port", "465");
 		props.setProperty("mail.smtps.auth", "true");
 
-		/*
-		 * If set to false, the QUIT command is sent and the connection is
-		 * immediately closed. If set to true (the default), this causes the
-		 * transport to wait for the response to the QUIT command.
-		 */
+		// jank from stackoverflow
 		props.put("mail.smtps.quitwait", "false");
 
 		Session session = Session.getInstance(props, null);
 
-		// -- Create a new message --
+		// the message
 		final MimeMessage msg = new MimeMessage(session);
 
-		// -- Set the FROM and TO fields --
+		//  to and from
 		msg.setFrom(new InternetAddress(username + "@gmail.com"));
 		msg.setRecipients(Message.RecipientType.TO,
 				InternetAddress.parse(recipientEmail, false));
 
+		//  check for cc
 		if (ccEmail.length() > 0) {
 			msg.setRecipients(Message.RecipientType.CC,
 					InternetAddress.parse(ccEmail, false));
@@ -69,11 +74,17 @@ public class Mail {
 	}
 
 	public static void main(String[] args) {
+	
+		//  create a new mail object
 		Mail test = new Mail();
+		
+		//  surround with try/catch to make sure there are no errors
 		try {
+			//  will not work
 //			test.Send("username", "password", "maxwellrkelly@gmail.com",
 //					"test", "This is a test");
 
+			//  Does it work?
 			test.Send("username", "password", "maxwellrkelly@gmail.com", "" /** no CC recipients **/, "test", "This is a test");
 
 		} catch (MessagingException e) {
