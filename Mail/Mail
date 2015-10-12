@@ -71,7 +71,7 @@ public class Mail {
 	public static void main(String[] args) {
 		Mail test = new Mail();
 		try {
-			test.Send("maxrkelly", "PandorasBox1", "maxwellrkelly@gmail.com",
+			test.Send("username", "password", "maxwellrkelly@gmail.com",
 					"test", "This is a test");
 		} catch (MessagingException e) {
 			e.printStackTrace();
