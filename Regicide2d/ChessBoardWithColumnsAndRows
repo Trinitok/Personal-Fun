@@ -1,0 +1,284 @@
+/*
+ * @author kellymr1
+ * 
+ * This is so that you do not have to pay $15 to play Warhammer 40.000 Regicide.
+ */
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.net.URL;
+import java.util.Random;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.swing.*;
+import javax.swing.border.*;
+
+public class ChessBoardWithColumnsAndRows {
+
+	private final JPanel gui = new JPanel(new BorderLayout(3, 3));
+	private JButton[][] chessBoardSquares = new JButton[8][8];
+	private JPanel chessBoard;
+	private final JLabel message = new JLabel("For the Emperor!");
+	private static final String COLS = "ABCDEFGH";
+	private static Random rand = new Random(1);
+
+	ChessBoardWithColumnsAndRows() {
+		initializeGui();
+	}
+
+	public final void initializeGui() {
+		// set up the main GUI
+		gui.setBorder(new EmptyBorder(5, 5, 5, 5));
+		JToolBar tools = new JToolBar();
+		tools.setFloatable(false);
+		gui.add(tools, BorderLayout.PAGE_START);
+		tools.add(new JButton("New")); // TODO - create new game
+		tools.add(new JButton("Save")); // TODO - create save game
+		tools.add(new JButton("Restore")); // TODO - create restore previous
+											// move
+		tools.addSeparator();
+		tools.add(new JButton("Surrender")); // TODO - add functionality!
+		tools.addSeparator();
+		tools.add(message);
+
+//		gui.add(new JLabel("?"), BorderLayout.LINE_START);
+
+		chessBoard = new JPanel(new GridLayout(0, 9));
+		chessBoard.setBorder(new LineBorder(Color.BLACK));
+		gui.add(chessBoard);
+
+		// create the chess board squares
+		Insets buttonMargin = new Insets(0, 0, 0, 0);
+		for (int i = 0; i < chessBoardSquares.length; i ++) {
+			for (int j = 0; j < chessBoardSquares[i].length; j ++) {
+				JButton b = new JButton();
+				b.setMargin(buttonMargin);
+				
+				
+				// our chess pieces are 64x64 px in size, so we'll
+				// 'fill this in' using a transparent icon..
+
+				// Find and save images here
+				ImageIcon icon = new ImageIcon(new BufferedImage(64, 64,
+						BufferedImage.TYPE_INT_ARGB));
+				
+				
+				b.setIcon(icon);
+				if ((j % 2 == 1 && i % 2 == 1)
+				// ) {
+						|| (j % 2 == 0 && i % 2 == 0)) {
+					b.setBackground(Color.WHITE);
+					
+				} else {
+					b.setBackground(Color.BLACK);
+				}
+				
+				//  set up position of pieces
+				if(i == 1 || i == 6){
+					ImageIcon pawns = new ImageIcon("pieces\\pawns.jpg");
+					Image old = pawns.getImage();
+					// scale image
+					Image newImage = old.getScaledInstance(40, 64,
+							Image.SCALE_SMOOTH);
+					pawns = new ImageIcon(newImage);
+					b.setIcon(pawns);
+				}
+				if((i == 0 && j == 3)  || (i == 7 && j == 4)){
+					ImageIcon pawns = new ImageIcon("pieces\\captain.jpg");
+					Image old = pawns.getImage();
+					// scale image
+					Image newImage = old.getScaledInstance(40, 64,
+							Image.SCALE_SMOOTH);
+					pawns = new ImageIcon(newImage);
+					b.setIcon(pawns);
+				}
+				if((i == 0 || i == 7)  && (j == 0 || j == 7)){
+					ImageIcon pawns = new ImageIcon("pieces\\rook.jpg");
+					Image old = pawns.getImage();
+					// scale image
+					Image newImage = old.getScaledInstance(40, 64,
+							Image.SCALE_SMOOTH);
+					pawns = new ImageIcon(newImage);
+					b.setIcon(pawns);
+				}
+				chessBoardSquares[j][i] = b;
+			}
+		}
+
+		// fill the chess board
+		chessBoard.add(new JLabel(""));
+		// fill the top row
+		for (int i = 0; i < 8; i ++) {
+			chessBoard.add(new JLabel(COLS.substring(i, i + 1),
+					SwingConstants.CENTER));
+		}
+		// fill the black non-pawn piece row
+		for (int i = 0; i < 8; i ++) {
+			for (int j = 0; j < 8; j ++) {
+				switch (j) {
+				case 0:
+					chessBoard.add(new JLabel("test" + (i + 1),
+							SwingConstants.CENTER));
+				default:
+					chessBoard.add(chessBoardSquares[j][i]);
+				}
+			}
+		}
+	}
+
+	public final JComponent getChessBoard() {
+		return chessBoard;
+	}
+
+	public final JComponent getGui() {
+		return gui;
+	}
+
+	// save the icon img
+	private static void saveImage(String imageUrl, String destinationFile)
+			throws IOException {
+		imageUrl.replaceAll(" ", "+");
+		URL url = new URL(imageUrl);
+		InputStream is = url.openStream();
+		OutputStream os = new FileOutputStream(destinationFile);
+
+		byte[] b = new byte[2048];
+		int length;
+
+		while ((length = is.read(b)) != -1) {
+			os.write(b, 0, length);
+		}
+
+		is.close();
+		os.close();
+
+	}
+
+	public static void main(String[] args) {
+		File test = new File("pieces");
+		if (!test.exists()) {
+			test.mkdirs();
+			try {
+				saveImage(
+						"http://vignette2.wikia.nocookie.net/warhammer40k/images/a/ad/Severian.JPG/revision/latest?cb=20130919044438",
+						"pieces\\pawns.jpg");
+				System.out.println("pawn ok");
+				saveImage(
+						"http://vignette4.wikia.nocookie.net/warhammer40k/images/0/09/DeathwatchStormWarden.jpg/revision/latest?cb=20120530034538",
+						"pieces\\captain.jpg");
+				System.out.println("king ok");
+				saveImage(
+						"http://vignette2.wikia.nocookie.net/warhammer40k/images/5/50/Red_Scorpion_Terminator.jpg/revision/20120316040111",
+						"pieces\\rook.jpg");
+				saveImage(
+						"http://img2.wikia.nocookie.net/__cb20120703071738/warhammer40k/images/e/e0/Blood_Angel_DW_Devastator_Brother2.png",
+						"pieces\\bishop.jpg");
+				saveImage(
+						"http://vignette1.wikia.nocookie.net/warhammer40k/images/0/0b/AssaultMarineRender.jpg/revision/latest?cb=20120916173447",
+						"pieces\\knight.jpg");
+				saveImage(
+						"http://vignette1.wikia.nocookie.net/warhammer40k/images/8/8f/UM_Librarian.png/revision/latest?cb=20130904022918",
+						"pieces\\queen.jpg");
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		
+
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					Clip clip = AudioSystem.getClip();
+					// this will require mark/reset support because this
+					// requires multiple parsers for the file. Just a way Java
+					// interprets it all
+					InputStream in = new FileInputStream(
+							"Other Sounds\\Main_theme2.wav");
+					// add buffer for mark/reset support
+					InputStream buffIn = new BufferedInputStream(in);
+					AudioInputStream inputStream = AudioSystem
+							.getAudioInputStream(buffIn);
+
+					clip.open(inputStream);
+					// clip.setLoopPoints(0, 87);
+					clip.loop(Clip.LOOP_CONTINUOUSLY);
+
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.err.println(e.getMessage());
+				}
+			}
+		}).start();
+
+		Runnable r = new Runnable() {
+
+			@Override
+			public void run() {
+				ChessBoardWithColumnsAndRows cb = new ChessBoardWithColumnsAndRows();
+
+				JFrame frame = new JFrame("Warhammer 40.000 Regicide 2D");
+				frame.add(cb.getGui());
+				frame.setLocationByPlatform(true);
+
+				// ensures the frame is the minimum size it needs to be
+				// in order display the components within it
+				frame.pack();
+				// ensures the minimum size is enforced.
+				frame.setMinimumSize(frame.getSize());
+				frame.setVisible(true);
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							//  find which random starter will be used
+							rand.nextInt();
+							
+							Clip clip = AudioSystem.getClip();
+							// this will require mark/reset support because this
+							// requires multiple parsers for the file. Just a way Java
+							// interprets it all
+							InputStream in = new FileInputStream(
+									"Other Sounds\\Start 1.wav");
+							// add buffer for mark/reset support
+							InputStream buffIn = new BufferedInputStream(in);
+							AudioInputStream inputStream = AudioSystem
+									.getAudioInputStream(buffIn);
+
+							clip.open(inputStream);
+							// clip.setLoopPoints(0, 87);
+
+						} catch (Exception e) {
+							e.printStackTrace();
+							System.err.println(e.getMessage());
+						}
+					}
+				}).start();
+				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			}
+		};
+		SwingUtilities.invokeLater(r);
+	}
+
+	public static void backgroundMusic() {
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					Clip clip = AudioSystem.getClip();
+					InputStream in = new FileInputStream(
+							"Other Sounds\\Main_theme.wav");
+					AudioInputStream inputStream = AudioSystem
+							.getAudioInputStream(in);
+
+					clip.open(inputStream);
+					clip.start();
+				} catch (Exception e) {
+					System.err.println(e.getMessage());
+				}
+			}
+		}).start();
+	}
+}
