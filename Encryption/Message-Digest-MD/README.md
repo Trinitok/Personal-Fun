@@ -1,1 +1,0 @@
-This folder will be the main folder that will house all the files I create recreationally.  All the files in here will be used for educational purposes to show off different types of security algorithms.  I will provide separate READMEs on how each algorithm works, comparison to other algorithms, pros, and cons of each algorithm in the various folders and directories.
