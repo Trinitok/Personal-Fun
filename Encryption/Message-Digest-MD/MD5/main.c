@@ -194,6 +194,6 @@ int main(int argc, char *argv[])
 
     printf("\n");
     printf("The msg should be successfully encrypted with MD5\n");
-//    system("pause");  //  uncomment this when ready to throw on GitHub
+    system("pause");  //  uncomment this when ready to throw on GitHub
     return 0;
 }
