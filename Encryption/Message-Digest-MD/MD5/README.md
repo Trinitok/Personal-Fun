@@ -3,16 +3,12 @@ MD5Sum is a 128-bit hashing algorithm that was used up until 2012 to encode file
 pros
 --
 -  File verification
+-  Defense against preimage attacks
 
 cons
 --
--  Extreme vulnerabilities.  No longer considered a viable form of defense
+-  Extreme vulnerabilities to collisions
 -  One way algorithm.  No way to really "decrypt" due to pigeonholing principle.  There are 2^128 possible combinations, and an infinite (approximately) amount of string inputs.  Since they are all being compressed, it is impossible to accurately get the exact return value in SOME cases because larger string inputs will lose data when being compressed.
 
 
-
-Comparison to MD2
-
 Comparison to MD4
-
-Comparison to MD6
