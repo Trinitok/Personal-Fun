@@ -21,10 +21,17 @@ Pros
 --
 - Very fast
 - Few collisions
+- good for multiple system simulations (games for example)
+- Low memory/system requirements
 
 Cons
 --
+- Not suitable for crypto analysis
+- Good, not great, "randomness"
 
+DJB2 vs DJB2A
+--
+- DJB2A is faster and will have fewer collisions
 
 Examples
 --
@@ -34,4 +41,5 @@ http://www.docjar.com/html/api/java/lang/String.java.html
 References
 --
 http://stackoverflow.com/questions/10696223/reason-for-5381-number-in-djb-hash-function/13809282#13809282
+http://blog.intelligencecomputing.io/software-develop/6806/repost-which-hashing-algorithm-is-best-for-uniqueness-and-speed
 http://www.cse.yorku.ca/~oz/hash.html
