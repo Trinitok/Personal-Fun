@@ -12,3 +12,10 @@ cons
 
 
 Comparison to MD4
+--
+Examples
+--
+<a href="http://www.yahoo.com"> Yahoo </a> still uses MD5 to hash passwords
+References
+--
+https://tools.ietf.org/html/rfc1321
