@@ -11,5 +11,5 @@ Several using SHA for checksum can be found with simple Google searches
 
 References
 --
-https://help.ubuntu.com/community/HowToSHA256SUM
-https://en.wikipedia.org/wiki/SHA-2
+- https://help.ubuntu.com/community/HowToSHA256SUM
+- https://en.wikipedia.org/wiki/SHA-2
