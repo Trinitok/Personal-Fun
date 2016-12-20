@@ -4,9 +4,11 @@ The Secure Hash Algorithms (SHA) include some of the most secure one way hashing
 Comparisons
 --
 - (Dec 20, 2016) I will upload some soon for comparison
+
 Examples
 --
 Several using SHA for checksum can be found with simple Google searches
+
 References
 --
 https://help.ubuntu.com/community/HowToSHA256SUM
