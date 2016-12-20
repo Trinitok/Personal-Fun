@@ -4,3 +4,8 @@ DJB
 
 DJB2 v. DJB2a
 --
+The key difference in how these two algorithms work is very small, but effective.  Instead of multiplying, there is an XOR amongst the bits.  This causes the DJB2A algorithm to have considerably fewer collisions, and also take longer to compute than the original.
+
+
+Link for current statistics:
+<a href="http://softwareengineering.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed"> StackOverflow </a>
