@@ -9,7 +9,7 @@ Created and named after Dr. Daniel Bernstein.  This is a universal hashing algor
         int c;
 
         while (c = *str++)
-            hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+            hash = ((hash << 5) + hash) ^ c; /* hash * 33 ^ c */
 
         return hash;
     }
